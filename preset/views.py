@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import generics
+from rest_framework import generics, status
 from django.http import FileResponse
 from .models import post
 from .serializer import PostSerializer
@@ -33,9 +33,12 @@ class PostView(generics.ListCreateAPIView):
     queryset = post.objects.all()
     serializer_class = PostSerializer
 
-class PostSingeSearch(generics.RetrieveAPIView):
-    queryset = post.objects.all()
-    serializer_class = PostSerializer
+class SearchPostsByTitle(APIView):
+    def get(self, request):
+        search_term = request.query_params.get('title', '')
+        queryset = post.objects.filter(title__icontains=search_term)
+        serializer = PostSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
@@ -46,4 +49,16 @@ class Last15PostsView(APIView):
         serializer = PostSerializer(last_posts, many=True)
         return Response(serializer.data)
 
+# catagories wise post
+
+class CategoryPostListView(generics.ListAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        # Get the catagories ID from the URL parameter
+        catagories_id = self.kwargs['catagories_id']
+
+        # Filter posts by catagories ID
+        queryset = post.objects.filter(catagories__id=catagories_id)
+        return queryset
 
