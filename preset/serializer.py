@@ -12,3 +12,9 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = post
         fields = "__all__"
+
+
+class CatagoiresSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Catagores
+        fields = "__all__"

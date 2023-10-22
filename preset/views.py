@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, status
 from django.http import FileResponse
-from .models import post
-from .serializer import PostSerializer
+from .models import post,Catagores
+from .serializer import PostSerializer,CatagoiresSerializer
 
 
 from rest_framework.views import APIView
@@ -51,14 +51,17 @@ class Last15PostsView(APIView):
 
 # catagories wise post
 
-class CategoryPostListView(generics.ListAPIView):
-    serializer_class = PostSerializer
+class CategoryPostListView(APIView):
+    def get(self, request, catagories_id):
+        try:
+            queryset = post.objects.filter(catagories__id=catagories_id)
+            serializer = PostSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except post.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def get_queryset(self):
-        # Get the catagories ID from the URL parameter
-        catagories_id = self.kwargs['catagories_id']
+class CatagoryListVIew(generics.ListAPIView):
+        queryset = Catagores.objects.all()
+        serializer_class = CatagoiresSerializer
 
-        # Filter posts by catagories ID
-        queryset = post.objects.filter(catagories__id=catagories_id)
-        return queryset
 
