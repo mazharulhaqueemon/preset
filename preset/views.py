@@ -55,7 +55,7 @@ class CategoryPostListView(APIView):
     def get(self, request, catagories_id):
         try:
             queryset = post.objects.filter(catagories__id=catagories_id)
-            serializer = PostSerializer(queryset, many=True)
+            serializer = PostSerializer(queryset, many=True,context={"request":request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except post.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
